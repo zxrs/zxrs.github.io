@@ -5,7 +5,15 @@
     <script async src="t2p.js"></script>
     <script>
         Module = {};
-        Module["onRuntimeInitialized"] = async () => {
+        const init = () => {
+            return new Promise(resolve => {
+                Module.onRuntimeInitialized = resolve;
+            });
+        };
+
+        (async () => {
+            await init();
+
             const response = await fetch("test.tif");
 
             // copy tiff data to wasm heap.
@@ -32,10 +40,10 @@
 
             // encode to base64 data url.
             function to_dataurl(blob) {
-                return new Promise(res => {
+                return new Promise(resolve => {
                     const reader = new FileReader();
                     reader.onload = () => {
-                        res(reader.result);
+                        resolve(reader.result);
                     };
                     reader.readAsDataURL(blob)
                 });
@@ -50,7 +58,7 @@
             a.href = dataurl;
             a.click();
             a.remove();
-        };
+        })();
     </script>
 </body>
 
