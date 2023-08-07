@@ -5,17 +5,51 @@
     <script async src="t2p.js"></script>
     <script>
         Module = {};
-        Module["onRuntimeInitialized"] = function () {
-            (async () => {
-                const res = await fetch("test.tif");
-                const data = await res.arrayBuffer();
-                const array = new Uint8Array(data);
-                const ptr = Module._malloc(array.length);
-                Module.HEAPU8.set(array, ptr);
-                const base64 = ccall("generate_pdf", "string", ["number", "number"], [ptr, array.length]);
-                Module._free(ptr);
-                document.location.href = "data:application/pdf;base64," + base64;
-            })();
+        Module["onRuntimeInitialized"] = async () => {
+            const response = await fetch("test.tif");
+
+            // copy tiff data to wasm heap.
+            const data = await response.arrayBuffer();
+            const array = new Uint8Array(data);
+            const ptr = Module._malloc(array.length);
+            Module.HEAPU8.set(array, ptr);
+
+            // generate pdf.
+            const result_ptr = ccall("generate_pdf", "number", ["number", "number"], [ptr, array.length]);
+
+            // free wasm side tiff data.
+            Module._free(ptr);
+
+            // get pdf data length.
+            const len = ccall("buf_len", "number", [], []);
+
+            // copy pdf data to javascript side.
+            const view = new Uint8Array(Module.HEAPU8.buffer, result_ptr, len);
+            const result = new Uint8Array(view);
+
+            // free wasm side pdf data.
+            ccall("free_buf", "", [], []);
+
+            // encode to base64 data url.
+            function to_dataurl(blob) {
+                return new Promise(res => {
+                    const reader = new FileReader();
+                    reader.onload = () => {
+                        res(reader.result);
+                    };
+                    reader.readAsDataURL(blob)
+                });
+            }
+            const blob = new Blob([result], { type: "application/pdf" });
+            const dataurl = await to_dataurl(blob);
+
+            // download pdf.
+            const a = document.createElement("a");
+            document.body.appendChild(a);
+            a.download = "test.pdf";
+            a.href = dataurl;
+            a.click();
+            a.remove();
         };
     </script>
 </body>
