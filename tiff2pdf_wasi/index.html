@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+    <body>
+        <script src="main.js"></script>
+        <script>
+            function to_dataurl(blob) {
+                return new Promise(resolve => {
+                    const reader = new FileReader();
+                    reader.onload = () => {
+                        resolve(reader.result);
+                    };
+                    reader.readAsDataURL(blob);
+                });
+            }
+            (async () => {
+                const res = await fetch("test.tif");
+                const array = await res.arrayBuffer();
+                const pdf = await window.generate_pdf(new Uint8Array(array));
+                const dataurl = await to_dataurl(new Blob([pdf], { type: "application/pdf" }));
+                const a = document.createElement("a");
+                a.download = "test.pdf";
+                a.href = dataurl;
+                a.click();
+                a.remove();
+            })();
+        </script>
+    </body>
+</html>
