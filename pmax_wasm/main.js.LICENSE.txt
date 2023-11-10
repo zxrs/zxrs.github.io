@@ -1,0 +1,19 @@
+/*!
+ * @wasmer/wasi
+ * Isomorphic Javascript library for interacting with WASI Modules in Node.js and the Browser.
+ *
+ * @version v1.2.2
+ * @author Wasmer Engineering Team <engineering@wasmer.io>
+ * @homepage https://github.com/wasmerio/wasmer-js
+ * @repository https://github.com/wasmerio/wasmer-js
+ * @license MIT
+ */
+
+/*!
+ * The buffer module from node.js, for the browser.
+ *
+ * @author   Feross Aboukhadijeh <https://feross.org>
+ * @license  MIT
+ */
+
+/*! ieee754. BSD-3-Clause License. Feross Aboukhadijeh <https://feross.org/opensource> */
