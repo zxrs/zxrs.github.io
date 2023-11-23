@@ -40,8 +40,8 @@ const compress = async (f) => {
 };
 
 const onchange = async () => {
-    const file = document.querySelector("#file");
-    for (const f of file.files) {
+    const file = [...document.querySelector("#file").files].sort((a, b) => a.name.localeCompare(b.name));
+    for (const f of file) {
         await compress(f);
     }
 };
@@ -58,7 +58,8 @@ window.addEventListener("dragover", (e) => {
 window.addEventListener("drop", async (e) => {
     e.preventDefault();
 
-    for (const f of e.dataTransfer.files) {
+    const files = [...e.dataTransfer.files].sort((a, b) => a.name.localeCompare(b.name));
+    for (const f of files) {
         await compress(f);
     }
 });
