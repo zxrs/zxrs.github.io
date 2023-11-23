@@ -32,7 +32,7 @@ const read = (file) => {
 const compress = async (f) => {
     const name = f.name;
     const jpg = await read(f);
-    const compressed_jpg = await window.generate_jpg(jpg, 70.0, 1600, true, 1.0);
+    const compressed_jpg = await window.generate_jpg(jpg, 60.0, 1280, true, 1.0);
     const size = Math.trunc(compressed_jpg.length / 1024);
     const blob = new Blob([compressed_jpg], {type: "image/jpeg"});
     const dataurl = URL.createObjectURL(blob);;
