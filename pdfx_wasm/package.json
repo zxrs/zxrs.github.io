@@ -1,0 +1,11 @@
+{
+  "name": "pdfx_wasm",
+  "version": "0.1.0",
+  "files": [
+    "pdfx_wasm_bg.wasm",
+    "pdfx_wasm.js",
+    "pdfx_wasm.d.ts"
+  ],
+  "browser": "pdfx_wasm.js",
+  "types": "pdfx_wasm.d.ts"
+}
