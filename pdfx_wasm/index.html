@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html style="height: 95%;">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>pdfx_wasm</title>
+</head>
+
+<body style="min-height: 100%;">
+    <input id="file" type="file" accept="application/pdf" multiple />
+    <hr />
+    <dialog id="form">
+        <form>
+            <input id="input" type="text" width="200" />
+            <button id="button">Extract</button>
+        </form>
+    </dialog>
+    <div id="container" style="padding-top: 0px;"></div>
+    <script src="pdfium.js"></script>
+    <script src="pdfx_wasm.js"></script>
+    <script>
+        let Pdfx = {};
+        let Module;
+        let RustModule;
+
+        const read = (file) => {
+            return new Promise(resolve => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    resolve(e.target.result);
+                };
+                reader.readAsArrayBuffer(file);
+            });
+        };
+
+        const get_input = (form) => {
+            return new Promise(resolve => {
+                const button = document.querySelector("#button");
+                button.onclick = (e) => {
+                    e.preventDefault();
+                    resolve(document.querySelector("#input").value);
+                    form.close();
+                };
+            });
+        };
+
+        const start = async (files) => {
+            const file_name = files[0].name;
+            let blob;
+            if (files.length == 1) {
+                const form = document.querySelector("#form");
+                form.showModal();
+                const arg = await get_input(form);
+                blob = await Pdfx.extract(files[0], arg);
+            } else {
+                blob = await Pdfx.concat(files);
+            }
+
+            const url = URL.createObjectURL(blob);
+            const div = document.createElement("div");
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = file_name;
+            a.innerText = file_name;
+            div.appendChild(a);
+            document.querySelector("#container").appendChild(div);
+        };
+
+        const onchange = async () => {
+            const files = [...document.querySelector("#file").files].sort((a, b) => a.name.localeCompare(b.name));
+            await start(files);
+        };
+
+        window.addEventListener("DOMContentLoaded", async () => {
+            Module = await PDFiumModule();
+            const {initialize_pdfium_render, concat, extract} = wasm_bindgen;
+            Pdfx.concat = concat;
+            Pdfx.extract = extract;
+            RustModule = await wasm_bindgen("pdfx_wasm_bg.wasm");
+            console.assert(initialize_pdfium_render(Module, RustModule, false), "Initialization failed.");
+            document.querySelector("#file").addEventListener("change", onchange);
+        });
+        window.addEventListener("dragover", (e) => {e.preventDefault()});
+        window.addEventListener("drop", async (e) => {
+            e.preventDefault();
+            const files = [...e.dataTransfer.files].sort((a, b) => a.name.localeCompare(b.name));
+            await start(files);
+        });
+    </script>
+</body>
+
+</html>
