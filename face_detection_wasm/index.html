@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>face detection wasm</title>
+</head>
+
+<body>
+    <video autoplay muted hidden id="v1"></video>
+    <canvas id="c1" width="320" height="240"></canvas>
+    <script type="module">
+        import init, {setup, detect} from "./pkg/face_detection.js"
+        const onload = async () => {
+            await init();
+            setup();
+
+            const constraints = {
+                video: true,
+                faceingMode: {exact: "user"},
+                width: 320,
+                height: 240,
+            };
+            const stream = await navigator.mediaDevices.getUserMedia(constraints);
+            const video = document.querySelector("#v1");
+            video.srcObject = stream;
+            video.play();
+
+            const canvas = document.querySelector("#c1");
+            const ctx = canvas.getContext("2d");
+            ctx.strokeStyle = "red";
+            ctx.lineWidth = 3;
+
+            const draw_image = () => {
+                ctx.drawImage(video, 0, 0, 320, 240);
+                const rgba = ctx.getImageData(0, 0, 320, 240).data;
+                detect(rgba).forEach((info) => {
+                    ctx.strokeRect(info.x, info.y, info.width, info.height);
+                });
+            };
+            setInterval(draw_image, 1000 / 30);
+        };
+        window.addEventListener("DOMContentLoaded", onload);
+    </script>
+</body>
+
+</html>
