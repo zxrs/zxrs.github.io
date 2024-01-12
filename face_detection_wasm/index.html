@@ -9,6 +9,7 @@
 <body>
     <video autoplay muted hidden id="v1"></video>
     <canvas id="c1" width="320" height="240"></canvas>
+    <div id="fps"></div>
     <script type="module">
         import init, {setup, detect} from "./pkg/face_detection.js"
         const onload = async () => {
@@ -31,14 +32,31 @@
             ctx.strokeStyle = "red";
             ctx.lineWidth = 3;
 
+            let last_time;
+            const fps_div = document.querySelector("#fps");
+
+            const show_fps = () => {
+                if (!last_time) {
+                    last_time = performance.now();
+                    return;
+                }
+                let delta = (performance.now() - last_time) / 1000;
+                last_time = performance.now();
+                const fps = Math.floor(1 / delta);
+                fps_div.innerText = `FPS: ${fps}`;
+            };
+
             const draw_image = () => {
                 ctx.drawImage(video, 0, 0, 320, 240);
                 const rgba = ctx.getImageData(0, 0, 320, 240).data;
                 detect(rgba).forEach((info) => {
                     ctx.strokeRect(info.x, info.y, info.width, info.height);
                 });
+                show_fps();
+                requestAnimationFrame(draw_image);
             };
-            setInterval(draw_image, 1000 / 30);
+            draw_image();
+            //setInterval(draw_image, 1000 / 30);
         };
         window.addEventListener("DOMContentLoaded", onload);
     </script>
