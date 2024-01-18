@@ -8,7 +8,7 @@
 
 <body>
     <video autoplay muted hidden id="v1"></video>
-    <canvas id="c1" width="320" height="240"></canvas>
+    <canvas id="c1"></canvas>
     <div id="fps"></div>
     <script type="module">
         import init, {setup, detect} from "./pkg/face_detection.js"
@@ -16,11 +16,14 @@
             await init();
             setup();
 
+            const width = 320;
+            const height = 240;
+
             const constraints = {
                 video: true,
                 faceingMode: {exact: "user"},
-                width: 320,
-                height: 240,
+                width: width,
+                height: height,
             };
             const stream = await navigator.mediaDevices.getUserMedia(constraints);
             const video = document.querySelector("#v1");
@@ -28,9 +31,10 @@
             video.play();
 
             const canvas = document.querySelector("#c1");
+            canvas.width = width;
+            canvas.height = height;
+
             const ctx = canvas.getContext("2d");
-            ctx.strokeStyle = "red";
-            ctx.lineWidth = 3;
 
             let last_time;
             const fps_div = document.querySelector("#fps");
@@ -47,16 +51,25 @@
             };
 
             const draw_image = () => {
-                ctx.drawImage(video, 0, 0, 320, 240);
-                const rgba = ctx.getImageData(0, 0, 320, 240).data;
-                detect(rgba).forEach((info) => {
-                    ctx.strokeRect(info.x, info.y, info.width, info.height);
+                ctx.drawImage(video, 0, 0, width, height);
+                const rgba = ctx.getImageData(0, 0, width, height).data;
+                detect(rgba, width).forEach((info) => {
+                    const top_ = info.x;
+                    const left_ = info.y;
+
+                    info.mosaic.forEach((row, j) => {
+                        row.pixels.forEach((rgb, i) => {
+                            const x = top_ + i * 8;
+                            const y = left_ + j * 8;
+                            ctx.fillStyle = `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`
+                            ctx.fillRect(x, y, 8, 8);
+                        });
+                    });
                 });
                 show_fps();
                 requestAnimationFrame(draw_image);
             };
             draw_image();
-            //setInterval(draw_image, 1000 / 30);
         };
         window.addEventListener("DOMContentLoaded", onload);
     </script>
