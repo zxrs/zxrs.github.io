@@ -92,14 +92,16 @@ function passArray8ToWasm0(arg, malloc) {
 /**
 * @param {Uint8Array} rgba
 * @param {number} img_width
+* @param {number} img_height
+* @param {number} block_size
 * @returns {(Info)[]}
 */
-export function detect(rgba, img_width) {
+export function detect(rgba, img_width, img_height, block_size) {
     try {
         const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
         const ptr0 = passArray8ToWasm0(rgba, wasm.__wbindgen_export_1);
         const len0 = WASM_VECTOR_LEN;
-        wasm.detect(retptr, ptr0, len0, img_width);
+        wasm.detect(retptr, ptr0, len0, img_width, img_height, block_size);
         var r0 = getInt32Memory0()[retptr / 4 + 0];
         var r1 = getInt32Memory0()[retptr / 4 + 1];
         var v2 = getArrayJsValueFromWasm0(r0, r1).slice();
@@ -236,11 +238,11 @@ export class Row {
     /**
     * @returns {(Rgb)[]}
     */
-    get pixels() {
+    get cols() {
         try {
             const ptr = this.__destroy_into_raw();
             const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
-            wasm.row_pixels(retptr, ptr);
+            wasm.row_cols(retptr, ptr);
             var r0 = getInt32Memory0()[retptr / 4 + 0];
             var r1 = getInt32Memory0()[retptr / 4 + 1];
             var v1 = getArrayJsValueFromWasm0(r0, r1).slice();
@@ -286,12 +288,12 @@ async function __wbg_load(module, imports) {
 function __wbg_get_imports() {
     const imports = {};
     imports.wbg = {};
-    imports.wbg.__wbg_row_new = function(arg0) {
-        const ret = Row.__wrap(arg0);
-        return addHeapObject(ret);
-    };
     imports.wbg.__wbg_info_new = function(arg0) {
         const ret = Info.__wrap(arg0);
+        return addHeapObject(ret);
+    };
+    imports.wbg.__wbg_row_new = function(arg0) {
+        const ret = Row.__wrap(arg0);
         return addHeapObject(ret);
     };
     imports.wbg.__wbg_rgb_new = function(arg0) {
