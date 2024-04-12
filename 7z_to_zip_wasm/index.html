@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+
+<body>
+    <h2>7z to zip using WebAssembly. No files are sent to the server.</h2>
+
+    <input id="file" type="file" accept=".7z" />
+
+    <div id="container"></div>
+
+    <script type="module">
+        import init, {process} from "./pkg/sevenz_to_zip.js";
+
+        const read = (blob) => {
+            return new Promise(resolve => {
+                const reader = new FileReader();
+                reader.onload = () => {
+                    resolve(reader.result);
+                };
+                reader.readAsArrayBuffer(blob);
+            });
+        };
+
+        const onchange = async () => {
+            const file = document.querySelector("#file").files[0];
+            const arrayBuffer = await read(file);
+            const result = process(new Uint8Array(arrayBuffer));
+            const blob = new Blob([result], {type: "application/zip"});
+            const url = URL.createObjectURL(blob);
+            const name = file.name.replace(".7z", ".zip");
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = name;
+            a.textContent = name;
+            document.querySelector("#container").appendChild(a);
+            a.click();
+        };
+
+        const onload = async () => {
+            await init();
+
+            window.addEventListener("change", onchange);
+        };
+
+        window.addEventListener("DOMContentLoaded", onload);
+    </script>
+</body>
+
+</html>
