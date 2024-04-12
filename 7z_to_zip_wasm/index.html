@@ -1,6 +1,12 @@
 <!DOCTYPE html>
 <html>
 
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>7z_to_zip_wasm</title>
+</head>
+
 <body>
     <h2>7z to zip using WebAssembly. No files are sent to the server.</h2>
 
@@ -38,7 +44,6 @@
 
         const onload = async () => {
             await init();
-
             window.addEventListener("change", onchange);
         };
 
