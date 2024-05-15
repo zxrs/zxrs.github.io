@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>bezip</title>
+</head>
+
+<body>
+    <h2>
+        An archive file (supported format: tar/tar.gz/tar.bz/tar.xz/7z) can be converted to a zip file using
+        WebAssembly.
+        No files are sent to the server.
+    </h2>
+
+    <input id="file" type="file" accept=".tar, .tar.gz, .tgz, .tar.bz, .tar.bz2, .tbz, .tbz2, .tar.xz, .txz, .7z" />
+
+    <div id="container"></div>
+
+    <script type="module">
+        import init, {process} from "./pkg/bezip.js";
+
+        const read = (blob) => {
+            return new Promise(resolve => {
+                const reader = new FileReader();
+                reader.onload = () => {
+                    resolve(reader.result);
+                };
+                reader.readAsArrayBuffer(blob);
+            });
+        };
+
+        const onchange = async () => {
+            try {
+                const file = document.querySelector("#file").files[0];
+                const arrayBuffer = await read(file);
+                const result = process(new Uint8Array(arrayBuffer));
+                const blob = new Blob([result], {type: "application/zip"});
+                const url = URL.createObjectURL(blob);
+                const name = file.name.replace(/(\.tar)*\.[a-z27]+$/i, ".zip");
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = name;
+                a.textContent = name;
+                document.querySelector("#container").appendChild(a);
+                a.click();
+            } catch (e) {
+                alert(e);
+                // for garbage collection
+                document.location.reload();
+            }
+        };
+
+        const onload = async () => {
+            await init();
+            window.addEventListener("change", onchange);
+        };
+
+        window.addEventListener("DOMContentLoaded", onload);
+    </script>
+</body>
+
+</html>
