@@ -39,11 +39,13 @@
                 const blob = new Blob([result], {type: "application/zip"});
                 const url = URL.createObjectURL(blob);
                 const name = file.name.replace(/(\.tar)*\.[a-z27]+$/i, ".zip");
+                const p = document.createElement("p");
                 const a = document.createElement("a");
                 a.href = url;
                 a.download = name;
                 a.textContent = name;
-                document.querySelector("#container").appendChild(a);
+                p.appendChild(a);
+                document.querySelector("#container").appendChild(p);
                 a.click();
             } catch (e) {
                 alert(e);
