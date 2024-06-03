@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>tile</title>
+</head>
+
+<body>
+    <h2>2 ページ目以降を 2x2 タイルに変換</h2>
+    <input id="file" type="file" accept="application/pdf" />
+    <hr />
+    <div id="container"></div>
+    <script src="pkg/tile.js"></script>
+    <script src="pkg/pdfium.js"></script>
+    <script>
+        let Tile = {};
+        let Module;
+        let RustModule;
+
+        const onchange = async () => {
+            const file = document.querySelector("#file").files[0];
+            const blob = await Tile.process(file);
+            const url = URL.createObjectURL(blob);
+            const div = document.createElement("div");
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = file.name;
+            a.innerText = file.name;
+            div.appendChild(a);
+            document.querySelector("#container").appendChild(div);
+        };
+
+        window.addEventListener("DOMContentLoaded", async () => {
+            Module = await PDFiumModule();
+            const {initialize_pdfium_render, process} = wasm_bindgen;
+            Tile.process = process;
+            RustModule = await wasm_bindgen("pkg/tile_bg.wasm");
+            console.assert(initialize_pdfium_render(Module, RustModule, false), "Initialization failed.");
+            document.querySelector("#file").addEventListener("change", onchange);
+        });
+    </script>
+</body>
+
+</html>
