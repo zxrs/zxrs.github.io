@@ -20,7 +20,7 @@ const onload = async () => {
     const draw_rounded_rect = (row, col, color) => {
         const x = col * block_size + 1;
         const y = row * block_size + 1;
-        const radius = 2;
+        const radius = 1;
         const width = block_size - 2;
         const height = block_size - 2;
 
