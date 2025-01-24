@@ -43,7 +43,7 @@ const onload = async () => {
 
         for (let row = 0; row < height / block_size; row++) {
             for (let col = 0; col < width / block_size; col++) {
-                const buf = [];
+                let total = 0;
                 const index = (row * 4 * width * block_size) + col * (width / block_size);
                 for (let i = 0; i < block_size; i++) {
                     /*
@@ -66,24 +66,22 @@ const onload = async () => {
                     */
                     const start = index + i * 4 * width;
                     const slice = data.slice(start, start + 4 * block_size);
-                    let sum = 0;
                     for (let i = 0; i < slice.length; i += 4) {
                         const pixel = slice.slice(i, i + 4);
                         // convert to grayscale
-                        sum += ((19 * pixel[0]) >> 8) + ((183 * pixel[1]) >> 8) + ((53 * pixel[2]) >> 8);
+                        total += ((19 * pixel[0]) >> 8) + ((183 * pixel[1]) >> 8) + ((53 * pixel[2]) >> 8);
                     }
-                    buf.push(sum);
                 }
                 // calculate the average grayscale values in a 10 x 10 block
-                const ret = buf.reduce((acc, e) => {return acc + e;}) / (block_size * block_size);
+                const avg = total / (block_size * block_size);
                 let color;
-                if (ret < 52) {
+                if (avg < 52) {
                     color = "#252A2F";
-                } else if (53 <= ret && ret < 103) {
+                } else if (53 <= avg && avg < 103) {
                     color = "#1E4A35";
-                } else if (103 <= ret && ret < 154) {
+                } else if (103 <= avg && avg < 154) {
                     color = "#136C3C";
-                } else if (154 <= ret && ret < 205) {
+                } else if (154 <= avg && avg < 205) {
                     color = "#329B48";
                 } else {
                     color = "#36B768";
