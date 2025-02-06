@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["ImageFormat","PdfThumbError"],"struct":["Options","PdfThumb","Rect"]};
