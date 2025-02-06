@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":["ImageFormat","PdfThumbError"],"struct":["Options","PdfThumb","Rect"]};
+window.SIDEBAR_ITEMS = {"enum":["ImageFormat","PdfThumbError"],"struct":["Options","PdfDoc","Rect"]};
