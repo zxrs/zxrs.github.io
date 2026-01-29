@@ -8,3 +8,4 @@ const onload = () => {
 };
 
 window.addEventListener("click", onload);
+window.addEventListener("touchstart", onload);
