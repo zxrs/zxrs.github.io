@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+        <title>TIFF → PDF</title>
+        <style>
+            body {
+                font-family: "Arial Bold", sans-serif;
+            }
+            #title {
+            }
+            #dropArea {
+                width: 400px;
+                height: 300px;
+                border: 3px dashed #999;
+                border-radius: 5px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin: 100px auto;
+                border-radius: 10px;
+                color: #888;
+            }
+            #dropArea.dragover {
+                border-color: #2196f3;
+                color: #2196f3;
+                background: #f0f8ff;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="dropArea">TIFF ファイルをここにドラッグ＆ドロップ</div>
+        <script src="bundle.js"></script>
+        <script src="index.js"></script>
+    </body>
+</html>
